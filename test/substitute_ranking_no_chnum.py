@@ -8,7 +8,6 @@ import traceback
 import OpenHowNet
 
 def substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, substitution_words, word_freq_dict, substitution_num):
-
     MAX = 56065
     
     loss_scores = []
@@ -39,27 +38,27 @@ def substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, so
         except:
             hownet_scores.append(0)
 
-    assert len(loss_scores) == len(freq_scores) == len(sim_scores) == len(hownet_scores)
-    loss_scores_sorted = sorted(loss_scores)
-    loss_ranks = [loss_scores_sorted.index(x) + 1 for x in loss_scores]
-    freq_scores_sorted = sorted(freq_scores)
-    freq_ranks = [freq_scores_sorted.index(x) + 1 for x in freq_scores]
-    sim_scores_sorted = sorted(sim_scores, reverse=True)
-    sim_ranks = [sim_scores_sorted.index(x) + 1 for x in sim_scores]
-    hownet_scores_sorted = sorted(hownet_scores, reverse=True)
-    hownet_ranks = [hownet_scores_sorted.index(x) + 1 for x in hownet_scores]
-    all_ranks = [[substitution_word, loss+freq+sim+hownet] for substitution_word, loss, freq, sim, hownet in zip(substitution_words, loss_ranks, freq_ranks, sim_ranks, hownet_ranks)]
-    ss_sorted = sorted(all_ranks, key=lambda x:x[1])
-    ss_sorted = [x[0] for x in ss_sorted]
-    freq_rank_source = int(word_freq_dict[source_word]) if source_word in word_freq_dict else MAX
-    try:
-        freq_rank_next = int(word_freq_dict[ss_sorted[1]])
-    except:
-        freq_rank_next = MAX - 1
-    if ss_sorted[0] == source_word and freq_rank_source > freq_rank_next and len(ss_sorted)>=2:
-        pre_word = ss_sorted[1]
-    else:
-        pre_word = ss_sorted[0]
+        assert len(loss_scores) == len(freq_scores) == len(sim_scores) == len(hownet_scores)
+        loss_scores_sorted = sorted(loss_scores)
+        loss_ranks = [loss_scores_sorted.index(x) + 1 for x in loss_scores]
+        freq_scores_sorted = sorted(freq_scores)
+        freq_ranks = [freq_scores_sorted.index(x) + 1 for x in freq_scores]
+        sim_scores_sorted = sorted(sim_scores, reverse=True)
+        sim_ranks = [sim_scores_sorted.index(x) + 1 for x in sim_scores]
+        hownet_scores_sorted = sorted(hownet_scores, reverse=True)
+        hownet_ranks = [hownet_scores_sorted.index(x) + 1 for x in hownet_scores]
+        all_ranks = [[substitution_word, loss+freq+sim+hownet] for substitution_word, loss, freq, sim, hownet in zip(substitution_words, loss_ranks, freq_ranks, sim_ranks, hownet_ranks)]
+        ss_sorted = sorted(all_ranks, key=lambda x:x[1])
+        ss_sorted = [x[0] for x in ss_sorted]
+        freq_rank_source = int(word_freq_dict[source_word]) if source_word in word_freq_dict else MAX
+        try:
+            freq_rank_next = int(word_freq_dict[ss_sorted[1]])
+        except:
+            freq_rank_next = MAX - 1
+        if ss_sorted[0] == source_word and freq_rank_source > freq_rank_next and len(ss_sorted)>=2:
+            pre_word = ss_sorted[1]
+        else:
+            pre_word = ss_sorted[0]
     print(pre_word, ss_sorted)
 
     return pre_word, ss_sorted[:substitution_num:]
@@ -76,51 +75,6 @@ def cross_entropy_word(X, i, pos):
     loss = 0
     loss -= np.log10(X[i, pos])
     return loss
-
-# def sent_loss(model, tokenizer, sentence):
-#     tokenize_input = tokenizer.tokenize(sentence)
-#     input_ids = tokenizer.encode(tokenize_input, return_tensors='pt')
-#     input_ids = input_ids.to('cuda')
-#     sentence_loss = 0
-#     for i in range(torch.numel(input_ids)):
-#         if input_ids[0][i] == tokenizer.sep_token_id or input_ids[0][i] == tokenizer.cls_token_id:
-#             continue
-#         orignial_id = input_ids[0][i].item()
-#         input_ids[0][i] = tokenizer.mask_token_id
-#         with torch.no_grad():
-#             outputs = model(input_ids)
-#         print(outputs[0].shape)
-#         word_loss = cross_entropy_word(logits[0][0].cpu().numpy(), i, input_ids[0][i].cpu().numpy())
-#         sentence_loss += word_loss
-#         input_ids[0][i] = orignial_id
-
-#     return np.exp(sentence_loss/len(sentence))
-
-# def sent_loss(model, tokenizer, sentence):
-#     CLS_TOKEN = '[CLS]'
-#     SEP_TOKEN = '[SEP]'
-#     tokenize_input = tokenizer.tokenize(sentence)
-#     print(tokenize_input)
-#     input_ids = tokenizer.encode(tokenize_input, return_tensors='pt')
-#     tokenize_input.insert(0, CLS_TOKEN)
-#     tokenize_input.append(SEP_TOKEN)
-#     print(input_ids)
-#     input_ids = input_ids.to('cuda')
-#     sentence_loss = 0
-#     for i, word in enumerate(tokenize_input):
-#         if word==CLS_TOKEN or word==SEP_TOKEN:
-#             continue
-#         orignial_word = tokenize_input[i]
-#         tokenize_input[i] = '[MASK]'
-#         mask_input = tokenizer.encode(tokenize_input, return_tensors='pt')
-#         print(mask_input)
-#         mask_input = mask_input.to('cuda')
-#         with torch.no_grad():
-#             logits = model(mask_input)
-#         word_loss = cross_entropy_word(logits[0][0].cpu().numpy(), i, input_ids[0][i].cpu().numpy())
-#         sentence_loss += word_loss
-#         tokenize_input[i] = orignial_word
-#     return np.exp(sentence_loss/len(sentence))
 
 def sent_loss(model, tokenizer, sentence):
     tokenize_input = tokenizer.tokenize(sentence)
@@ -270,12 +224,11 @@ def main():
             mix_pre_word = 'NULL'
             mix_ss_sorted = ['NULL']
 
-        save_result(row_line, bert_pre_word, bert_ss_sorted, './data/bert_sr_res.csv')
-        # save_result(row_line, ernie_pre_word, ernie_ss_sorted, './data/ernie_sr_res.csv')
-        save_result(row_line, vector_pre_word, vector_ss_sorted, './data/vector_sr_res.csv')
-        save_result(row_line, dict_pre_word, dict_ss_sorted, './data/dict_sr_res.csv')
-        save_result(row_line, hownet_pre_word, hownet_ss_sorted, './data/hownet_sr_res.csv')
-        save_result(row_line, mix_pre_word, mix_ss_sorted, './data/mix_sr_res.csv')
+        save_result(row_line, bert_pre_word, bert_ss_sorted, './test/data/nochnum/bert_sr_res_no_chnum.csv')
+        save_result(row_line, vector_pre_word, vector_ss_sorted, './test/data/nochnum/vector_sr_res_no_chnum.csv')
+        save_result(row_line, dict_pre_word, dict_ss_sorted, './test/data/nochnum/dict_sr_res_no_chnum.csv')
+        save_result(row_line, hownet_pre_word, hownet_ss_sorted, './test/data/nochnum/hownet_sr_res_no_chnum.csv')
+        save_result(row_line, mix_pre_word, mix_ss_sorted, './test/data/nochnum/mix_sr_res_no_chnum.csv')
 
 if __name__ == '__main__':
     main()

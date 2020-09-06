@@ -36,6 +36,7 @@ def main():
             res.extend(word_candidates[difficult_word].get('verb'))
             res.extend(word_candidates[difficult_word].get('adj'))
             res.extend(word_candidates[difficult_word].get('adv'))
+            res = [word for word in res if len(word) <= len(difficult_word)]
         except:
             res = ['NULL']
         if len(res)==0:

@@ -7,14 +7,12 @@ import numpy as np
 import traceback
 import OpenHowNet
 
-def substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, substitution_words, word_freq_dict, substitution_num):
-
+def substitute_ranking(row_line, model_word2vector, model, tokenizer, source_sentence, source_word, substitution_words, word_freq_dict, substitution_num):
     MAX = 56065
     
     loss_scores = []
     freq_scores = []
     sim_scores = []
-    hownet_scores = []
 
     for i in range(len(substitution_words)):
         word = substitution_words[i]
@@ -33,22 +31,15 @@ def substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, so
             sim_scores.append(similarity)
         except:
             sim_scores.append(0)
-        try:
-            similarity = hownet.calculate_word_similarity(source_word, word)
-            hownet_scores.append(similarity)
-        except:
-            hownet_scores.append(0)
 
-    assert len(loss_scores) == len(freq_scores) == len(sim_scores) == len(hownet_scores)
+    assert len(loss_scores) == len(freq_scores) == len(sim_scores)
     loss_scores_sorted = sorted(loss_scores)
     loss_ranks = [loss_scores_sorted.index(x) + 1 for x in loss_scores]
     freq_scores_sorted = sorted(freq_scores)
     freq_ranks = [freq_scores_sorted.index(x) + 1 for x in freq_scores]
     sim_scores_sorted = sorted(sim_scores, reverse=True)
     sim_ranks = [sim_scores_sorted.index(x) + 1 for x in sim_scores]
-    hownet_scores_sorted = sorted(hownet_scores, reverse=True)
-    hownet_ranks = [hownet_scores_sorted.index(x) + 1 for x in hownet_scores]
-    all_ranks = [[substitution_word, loss+freq+sim+hownet] for substitution_word, loss, freq, sim, hownet in zip(substitution_words, loss_ranks, freq_ranks, sim_ranks, hownet_ranks)]
+    all_ranks = [[substitution_word, loss+freq+sim] for substitution_word, loss, freq, sim in zip(substitution_words, loss_ranks, freq_ranks, sim_ranks)]
     ss_sorted = sorted(all_ranks, key=lambda x:x[1])
     ss_sorted = [x[0] for x in ss_sorted]
     freq_rank_source = int(word_freq_dict[source_word]) if source_word in word_freq_dict else MAX
@@ -76,51 +67,6 @@ def cross_entropy_word(X, i, pos):
     loss = 0
     loss -= np.log10(X[i, pos])
     return loss
-
-# def sent_loss(model, tokenizer, sentence):
-#     tokenize_input = tokenizer.tokenize(sentence)
-#     input_ids = tokenizer.encode(tokenize_input, return_tensors='pt')
-#     input_ids = input_ids.to('cuda')
-#     sentence_loss = 0
-#     for i in range(torch.numel(input_ids)):
-#         if input_ids[0][i] == tokenizer.sep_token_id or input_ids[0][i] == tokenizer.cls_token_id:
-#             continue
-#         orignial_id = input_ids[0][i].item()
-#         input_ids[0][i] = tokenizer.mask_token_id
-#         with torch.no_grad():
-#             outputs = model(input_ids)
-#         print(outputs[0].shape)
-#         word_loss = cross_entropy_word(logits[0][0].cpu().numpy(), i, input_ids[0][i].cpu().numpy())
-#         sentence_loss += word_loss
-#         input_ids[0][i] = orignial_id
-
-#     return np.exp(sentence_loss/len(sentence))
-
-# def sent_loss(model, tokenizer, sentence):
-#     CLS_TOKEN = '[CLS]'
-#     SEP_TOKEN = '[SEP]'
-#     tokenize_input = tokenizer.tokenize(sentence)
-#     print(tokenize_input)
-#     input_ids = tokenizer.encode(tokenize_input, return_tensors='pt')
-#     tokenize_input.insert(0, CLS_TOKEN)
-#     tokenize_input.append(SEP_TOKEN)
-#     print(input_ids)
-#     input_ids = input_ids.to('cuda')
-#     sentence_loss = 0
-#     for i, word in enumerate(tokenize_input):
-#         if word==CLS_TOKEN or word==SEP_TOKEN:
-#             continue
-#         orignial_word = tokenize_input[i]
-#         tokenize_input[i] = '[MASK]'
-#         mask_input = tokenizer.encode(tokenize_input, return_tensors='pt')
-#         print(mask_input)
-#         mask_input = mask_input.to('cuda')
-#         with torch.no_grad():
-#             logits = model(mask_input)
-#         word_loss = cross_entropy_word(logits[0][0].cpu().numpy(), i, input_ids[0][i].cpu().numpy())
-#         sentence_loss += word_loss
-#         tokenize_input[i] = orignial_word
-#     return np.exp(sentence_loss/len(sentence))
 
 def sent_loss(model, tokenizer, sentence):
     tokenize_input = tokenizer.tokenize(sentence)
@@ -225,8 +171,7 @@ def main():
     print('loading models...')
     tokenizer = BertTokenizer.from_pretrained(model_cache)
     model = BertForMaskedLM.from_pretrained(model_cache)
-    # OpenHowNet.download()
-    hownet = OpenHowNet.HowNetDict(use_sim=True)
+
     model.to('cuda')
     model.eval()
     print('loading embeddings...')
@@ -245,37 +190,37 @@ def main():
     for row_line, source_sentence, source_word, bert_subs, vector_subs, dict_subs, hownet_subs, mix_subs in zip(row_lines, source_sentences, source_words, bert_res, vector_res, dict_res, hownet_res, mix_res):
         # 全部运行可能耗时较长，建议注释部分代码块运行需要的测试
         if bert_subs[0] != 'NULL':
-            bert_pre_word, bert_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, bert_subs, word_freq_dict, substitution_num)
+            bert_pre_word, bert_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, source_sentence, source_word, bert_subs, word_freq_dict, substitution_num)
         else:
             bert_pre_word = 'NULL'
             bert_ss_sorted = ['NULL']
         if vector_subs[0] != 'NULL':
-            vector_pre_word, vector_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, vector_subs, word_freq_dict, substitution_num)
+            vector_pre_word, vector_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, source_sentence, source_word, vector_subs, word_freq_dict, substitution_num)
         else:
             vector_pre_word = 'NULL'
             vector_ss_sorted = ['NULL']
         if dict_subs[0] != 'NULL':
-            dict_pre_word, dict_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, dict_subs, word_freq_dict, substitution_num)
+            dict_pre_word, dict_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, source_sentence, source_word, dict_subs, word_freq_dict, substitution_num)
         else:
             dict_pre_word = 'NULL'
             dict_ss_sorted = ['NULL']
         if hownet_subs[0] != 'NULL':
-            hownet_pre_word, hownet_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, hownet_subs, word_freq_dict, substitution_num)
+            hownet_pre_word, hownet_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, source_sentence, source_word, hownet_subs, word_freq_dict, substitution_num)
         else:
             hownet_pre_word = 'NULL'
             hownet_ss_sorted = ['NULL']
         if mix_subs[0] != 'NULL':
-            mix_pre_word, mix_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, mix_subs, word_freq_dict, substitution_num)
+            mix_pre_word, mix_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, source_sentence, source_word, mix_subs, word_freq_dict, substitution_num)
         else:
             mix_pre_word = 'NULL'
             mix_ss_sorted = ['NULL']
 
-        save_result(row_line, bert_pre_word, bert_ss_sorted, './data/bert_sr_res.csv')
-        # save_result(row_line, ernie_pre_word, ernie_ss_sorted, './data/ernie_sr_res.csv')
-        save_result(row_line, vector_pre_word, vector_ss_sorted, './data/vector_sr_res.csv')
-        save_result(row_line, dict_pre_word, dict_ss_sorted, './data/dict_sr_res.csv')
-        save_result(row_line, hownet_pre_word, hownet_ss_sorted, './data/hownet_sr_res.csv')
-        save_result(row_line, mix_pre_word, mix_ss_sorted, './data/mix_sr_res.csv')
+        save_result(row_line, bert_pre_word, bert_ss_sorted, './test/data/nohownet/bert_sr_res_no_hownet.csv')
+        # save_result(row_line, ernie_pre_word, ernie_ss_sorted, './test/data/nohownet/ernie_sr_res.csv')
+        save_result(row_line, vector_pre_word, vector_ss_sorted, './test/data/nohownet/vector_sr_res_no_hownet.csv')
+        save_result(row_line, dict_pre_word, dict_ss_sorted, './test/data/nohownet/dict_sr_res_no_hownet.csv')
+        save_result(row_line, hownet_pre_word, hownet_ss_sorted, './test/data/nohownet/hownet_sr_res_no_hownet.csv')
+        save_result(row_line, mix_pre_word, mix_ss_sorted, './test/data/nohownet/mix_sr_res_no_hownet.csv')
 
 if __name__ == '__main__':
     main()
