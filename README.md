@@ -1,4 +1,4 @@
-<img src="./docs/img/logo.png" width = "250"  alt="Chinese-LS Logo" align="center" />
+<p align="center"><img src="./docs/img/logo.png" width = "250"  alt="Chinese-LS Logo"/></p>
 
 English|[简体中文](README.zh.md)
 
@@ -14,7 +14,7 @@ Lexical simplification (LS) aims to replace complex words in a given sentence wi
 
 The entire framework of Chinese-LS is shown below:
 
-<img src="docs/img/Chinese_lexical_simplification_system.png" width = "500"  alt="Chinese-LS Framework" align="center" />
+<p align="center"><img src="docs/img/Chinese_lexical_simplification_system.png" width = "500"  alt="Chinese-LS Framework"/></p>
 
 ## Contact
 
@@ -32,7 +32,7 @@ Email: luxinyu12345@foxmail.com
 - OpenHowNet==0.0.1a11
 - gensim==3.8.2
 
-The entire ```requirements.txt``` can been seen [here](requirements.txt).
+The complete ```requirements.txt``` can been seen [here](requirements.txt).
 
 ### Preparations
 
@@ -49,7 +49,7 @@ Please place the models under the ```/model``` directory after downloading.
 
 We have already executed the codes for you and intermediate results can be found in ```/data```.
 
-If you want to try it yourself, please running them in following order: 
+If you want to run the codes for reproduction, please execute them in the following order: 
 
 #### Generate
 
