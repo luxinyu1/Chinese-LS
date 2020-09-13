@@ -2,34 +2,32 @@ English|[简体中文](./README.zh.md)
 
 ## Introduction
 
-- 524 instances in total
+- **524** instances in total
 
-- 由6名标注者人工标注，其中有2名标注者具有对外汉语/低年龄段儿童教学经验，其余为计算机系学生
+- Annotated by 6 people, 2 of them have teaching experience and others are undergraduates.
 
-- Annotated by 6 
+- Distribution of POS
 
-- 词性分布
+	|    POS    | Tag  | Total |
+	| :-------: | :--: | :---: |
+	|   noun    |  n   |  166  |
+	|   verb    |  v   |  160  |
+	| adjective |  a   |  134  |
+	|  adverb   |  d   |  64   |
 
-	|  词性  | 词性标签 | 个数 |
-	| :----: | :------: | :--: |
-	|  名词  |    n     | 166  |
-	|  动词  |    v     | 160  |
-	| 形容词 |    a     | 134  |
-	|  副词  |    d     |  64  |
+- Distribution of character number
 
-- 难词长度分布
+	| Number of Characters (Number of Syllables) | Total |
+	| :----------------------------------------: | :---: |
+	|             one character word             |   9   |
+	|            two characters word             |  472  |
+	|           three characters word            |  13   |
+	|            four characters word            |  30   |
 
-	|  长度  | 个数 |
-	| :----: | :--: |
-	| 一字词 |  9   |
-	| 二字词 | 472  |
-	| 三字词 |  13  |
-	| 四字词 |  30  |
+- Each instance has an average of **8.51** substitutes
 
-- 样本平均标签数：8.51个
+## Source of Corpus
 
-## 语料来源
-
-- [国家语委现代汉语平衡语料库](http://corpus.zhonghuayuwen.org/)（约占50%）
-- [nlp_chinese_corpus](https://github.com/brightmart/nlp_chinese_corpus)中的翻译语料（约占49%）
-- 网络综合（约占1%）
+- [Modern Chinese Balanced Corpus](http://corpus.zhonghuayuwen.org/)（About 50%）
+- Translation corpus from [nlp_chinese_corpus](https://github.com/brightmart/nlp_chinese_corpus)（About 49%）
+- Others（About 1%）

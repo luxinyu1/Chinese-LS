@@ -4,21 +4,21 @@ English|[简体中文](README.zh.md)
 
 ## What is Chinese-LS?
 
-Lexical simplification (LS) aims to replace complex words in a given sentence with their simpler alternatives of equivalent meaning. Chinese-LS is the first attempt in the field of Chinese Lexical Simplification. It includes a high-quality benchmark dataset and five baseline approaches: 
+Lexical simplification (LS) aims to replace complex words in a given sentence with their simpler alternatives of equivalent meaning. Chinese-LS is the first attempt in the field of Chinese Lexical Simplification. It includes a high-quality benchmark [dataset](./dataset/annotation_data.csv) and five baseline approaches: 
 
-1. Synonym dictionary-based approach
-2. Word embedding-based approach
-3. Pretrained language model-based approach
-4. Sememe-based approach
-5. Hybrid approach
+- Synonym dictionary-based approach
+
+- Word embedding-based approach
+
+- Pretrained language model-based approach
+
+- Sememe-based approach
+
+- Hybrid approach
 
 The entire framework of Chinese-LS is shown below:
 
-<p align="center"><img src="docs/img/Chinese_lexical_simplification_system.png" width = "500"  alt="Chinese-LS Framework"/></p>
-
-## Contact
-
-Email: luxinyu12345@foxmail.com
+<p align="center"><img src="docs/img/Chinese_lexical_simplification_system.png" width = "700"  alt="Chinese-LS Framework"/></p>
 
 ## Quick start
 
@@ -43,11 +43,13 @@ Chinese-LS uses the following pretrained models:
 - Word2Vec model: [Chinese-Word-Vector](https://github.com/Embedding/Chinese-Word-Vectors) (Mixed-large)
 - BERT-base, Chinese ([transformers](https://huggingface.co/bert-base-chinese)) 
 
-Please place the models under the ```/model``` directory after downloading.
+Please place the models under the ```./model``` directory after downloading.
 
 ### Run
 
-We have already executed the codes for you and intermediate results can be found in ```/data```.
+We have already executed the codes for you and intermediate results can be found in ```./data```.
+
+You could check out the details of codes and algorithms from our paper: [paper title]()
 
 If you want to run the codes for reproduction, please execute them in the following order: 
 
@@ -81,15 +83,19 @@ Run ```substitute_selection.py```
 
 Run ```substitute_ranking.py```
 
-### Experiment
+### Experiments
 
-Run ```experiment.py```
+Chinese-LS designs 5 experiments to evaluate the quality of our dataset and the performance of five approaches. You could get the experiment results through running ```experiment.py```.
 
 ## Citation
 
 ```
 
 ```
+
+## Contact
+
+Email: luxinyu12345@foxmail.com
 
 ## License
 
