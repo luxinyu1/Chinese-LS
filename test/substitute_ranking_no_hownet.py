@@ -216,7 +216,6 @@ def main():
             hybrid_ss_sorted = ['NULL']
 
         save_result(row_line, bert_pre_word, bert_ss_sorted, './test/data/nohownet/bert_sr_res_no_hownet.csv')
-        # save_result(row_line, ernie_pre_word, ernie_ss_sorted, './test/data/nohownet/ernie_sr_res.csv')
         save_result(row_line, vector_pre_word, vector_ss_sorted, './test/data/nohownet/vector_sr_res_no_hownet.csv')
         save_result(row_line, dict_pre_word, dict_ss_sorted, './test/data/nohownet/dict_sr_res_no_hownet.csv')
         save_result(row_line, hownet_pre_word, hownet_ss_sorted, './test/data/nohownet/hownet_sr_res_no_hownet.csv')
