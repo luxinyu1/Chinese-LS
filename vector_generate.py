@@ -33,17 +33,14 @@ def save_results(sim_words, output_path):
 
 def main():
     EVAL_FILE = './dataset/annotation_data.csv'
-    WORD_FREQ_DICT = './data/word_counted.csv'
     OUTPUT_PATH = './data/vector_output.csv'
     WORD_2_VECTOR_MODEL_DIR = './model/merge_sgns_bigram_char300.txt'
 
     eval_file = EVAL_FILE
-    freq_dict_path = WORD_FREQ_DICT
     output_path = OUTPUT_PATH
     word_2_vector_model_dir = WORD_2_VECTOR_MODEL_DIR
 
     sentences, difficult_words = read_dataset(eval_file)
-    freq_dict = read_freq_dict(freq_dict_path)
 
     for difficult_word in difficult_words:
         sim_words = []

@@ -142,27 +142,27 @@ BERT_GEN = './data/bert_ss_res.csv'
 VECTOR_GEN = './data/vector_ss_res.csv'
 DICT_GEN = './data/dict_ss_res.csv'
 HOWNET_GEN = './data/hownet_ss_res.csv'
-MIX_GEN = './data/mix_ss_res.csv'
+HYBRID_GEN = './data/hybrid_ss_res.csv'
 
 BERT_OUTPUT = './data/bert_sr_res.csv'
 # ERNIE_OUTPUT = './data/ss_ernie_res.csv'
 VECTOR_OUTPUT = './data/vector_sr_res.csv'
 DICT_OUTPUT = './data/dict_sr_res.csv'
 HOWNET_OUTPUT = './data/hownet_sr_res.csv'
-MIX_OUTPUT = './data/mix_sr_res.csv'
+HYBRID_OUTPUT = './data/hybrid_sr_res.csv'
 
 BERT_HUMAN = './data/eval/bert_manual_eval.csv'
 DICT_HUMAN = './data/eval/dict_manual_eval.csv'
 VECTOR_HUMAN = './data/eval/vector_manual_eval.csv'
 HOWNET_HUMAN = './data/eval/hownet_manual_eval.csv'
-MIX_HUMAN = './data/eval/mix_manual_eval.csv'
+HYBRID_HUMAN = './data/eval/hybrid_manual_eval.csv'
 
 word_freq_dict = WORD_FREQ_DICT
 bert_gen = BERT_GEN
 vector_gen = VECTOR_GEN
 dict_gen = DICT_GEN
 hownet_gen = HOWNET_GEN
-mix_gen = MIX_GEN
+hybrid_gen = HYBRID_GEN
 
 manual_path = MANUAL_PATH
 bert_output = BERT_OUTPUT
@@ -170,7 +170,7 @@ bert_output = BERT_OUTPUT
 vector_output = VECTOR_OUTPUT
 dict_output = DICT_OUTPUT
 hownet_output = HOWNET_OUTPUT
-mix_output = MIX_OUTPUT
+hybrid_output = HYBRID_OUTPUT
 
 origin_words, manual_labels = read_manual_data(manual_path)
 
@@ -178,26 +178,26 @@ b_g = read_gen_data(bert_gen)
 v_g = read_gen_data(vector_gen)
 d_g = read_gen_data(dict_gen)
 h_g = read_gen_data(hownet_gen)
-m_g = read_gen_data(mix_gen)
+m_g = read_gen_data(hybrid_gen)
 
 bert_human = BERT_HUMAN
 dict_human = DICT_HUMAN
 vector_human = VECTOR_HUMAN
 hownet_human = HOWNET_HUMAN
-mix_human = MIX_HUMAN
+hybrid_human = HYBRID_HUMAN
 
 bert_pre_words, bert_substitutions = read_sr_data(bert_output)
 # ernie_pre_words, ernie_substitutions = read_sr_data(ernie_output)
 vector_pre_words, vector_substitutions = read_sr_data(vector_output)
 dict_pre_words, dict_substitutions = read_sr_data(dict_output)
 hownet_pre_words, hownet_substitutions = read_sr_data(hownet_output)
-mix_pre_words, mix_substitutions = read_sr_data(mix_output)
+hybrid_pre_words, hybrid_substitutions = read_sr_data(hybrid_output)
 
 bert_human_eval = read_eval_data(bert_human)
 dict_human_eval = read_eval_data(dict_human)
 vector_human_eval = read_eval_data(vector_human)
 hownet_human_eval = read_eval_data(hownet_human)
-mix_human_eval = read_eval_data(mix_human)
+hybrid_human_eval = read_eval_data(hybrid_human)
 
 print('='*30 + 'Exp0' + '='*30 + '\n')
 print('-'*30 + 'BERT' + '-'*30 + '\n')
@@ -216,8 +216,8 @@ print('-'*30 + 'Sememe' + '-'*30 + '\n')
 changed, human, auto, cons = evaluate_dataset(hownet_human_eval, hownet_pre_words, origin_words, manual_labels)
 print('changed:' + str(changed) + '\t' + 'human:' + '%.4f'%human + '\t' + 'auto:' + '%.4f'%auto + '\t' + 'cons:' + str(cons))
 
-print('-'*30 + 'Mix' + '-'*30 + '\n')
-changed, human, auto, cons = evaluate_dataset(mix_human_eval, mix_pre_words, origin_words, manual_labels)
+print('-'*30 + 'Hybrid' + '-'*30 + '\n')
+changed, human, auto, cons = evaluate_dataset(hybrid_human_eval, hybrid_pre_words, origin_words, manual_labels)
 print('changed:' + str(changed) + '\t' + 'human:' + '%.4f'%human + '\t' + 'auto:' + '%.4f'%auto + '\t' + 'cons:' + str(cons))
 
 print('='*30 + 'Exp1' + '='*30 + '\n')
@@ -268,9 +268,9 @@ precision, accuracy, changed_proportion = evaluate_pipeline_scores(hownet_pre_wo
 print('PRE:' + '%.4f'%precision + '\t' + 'ACC:' + '%.4f'%accuracy + '\n')
 
 print('-'*30 + 'Hybrid' + '-'*30 + '\n')
-# potential, precision, recall, F_score = evaluate_SS_scores(mix_substitutions, manual_labels)
+# potential, precision, recall, F_score = evaluate_SS_scores(hybrid_substitutions, manual_labels)
 # print('POTN:' + '%.4f'%potential + '\t' +'PRE:' + '%.4f'%precision + '\t' + 'RE:' + '%.4f'%recall + '\t' + 'F1:' + '%.4f'%F_score + '\n')
-precision, accuracy, changed_proportion = evaluate_pipeline_scores(mix_pre_words, origin_words, manual_labels)
+precision, accuracy, changed_proportion = evaluate_pipeline_scores(hybrid_pre_words, origin_words, manual_labels)
 print('PRE:' + '%.4f'%precision + '\t' + 'ACC:' + '%.4f'%accuracy + '\n')
 
 print('='*30 + 'Exp3' + '='*30 + '\n')
@@ -290,37 +290,37 @@ print('-'*30 + 'Sememe' + '-'*30 + '\n')
 no_error, no_error_score, error3a, error3a_score, error3b,  error3b_score, error4, error4_score, error5, error5_score = evaluate_error(word_freq_rank, manual_labels, hownet_pre_words, h_g)
 print('no_error:' + '%.4f'%no_error_score + '(%d)'%no_error + '\t' + 'error_1:' + '%.4f'%error3a_score +'(%d)'%error3a + '\t' + 'error_2:' + '%.4f'%error3b_score + '(%d)'%error3b + '\t' + 'error3:' + '%.4f'%error4_score + '(%d)'%error4 + '\t' + 'error5_score:' + '%.4f'%error5_score + '(%d)'%error5 + '\n')
 print('-'*30 + 'Hybrid' + '-'*30 + '\n')
-no_error, no_error_score, error3a, error3a_score, error3b,  error3b_score, error4, error4_score, error5, error5_score = evaluate_error(word_freq_rank, manual_labels, mix_pre_words, m_g)
+no_error, no_error_score, error3a, error3a_score, error3b,  error3b_score, error4, error4_score, error5, error5_score = evaluate_error(word_freq_rank, manual_labels, hybrid_pre_words, m_g)
 print('no_error:' + '%.4f'%no_error_score + '(%d)'%no_error + '\t' + 'error_1:' + '%.4f'%error3a_score +'(%d)'%error3a + '\t' + 'error_2:' + '%.4f'%error3b_score + '(%d)'%error3b + '\t' + 'error3:' + '%.4f'%error4_score + '(%d)'%error4 + '\t' + 'error5_score:' + '%.4f'%error5_score + '(%d)'%error5 + '\n')
 no_hownet_bert, _ = read_sr_data('./test/data/nohownet/bert_sr_res_no_hownet.csv')
 no_hownet_embedding, _ = read_sr_data('./test/data/nohownet/vector_sr_res_no_hownet.csv')
 no_hownet_dict, _ = read_sr_data('./test/data/nohownet/dict_sr_res_no_hownet.csv')
 no_hownet_hownet, _ = read_sr_data('./test/data/nohownet/hownet_sr_res_no_hownet.csv')
-no_hownet_hybrid, _ = read_sr_data('./test/data/nohownet/mix_sr_res_no_hownet.csv')
+no_hownet_hybrid, _ = read_sr_data('./test/data/nohownet/hybrid_sr_res_no_hownet.csv')
 
 no_bert_bert, _ = read_sr_data('./test/data/nobert/bert_sr_res_no_bert.csv')
 no_bert_embedding, _ = read_sr_data('./test/data/nobert/vector_sr_res_no_bert.csv')
 no_bert_dict, _ = read_sr_data('./test/data/nobert/dict_sr_res_no_bert.csv')
 no_bert_hownet, _ = read_sr_data('./test/data/nobert/hownet_sr_res_no_bert.csv')
-no_bert_hybrid, _ = read_sr_data('./test/data/nobert/mix_sr_res_no_bert.csv')
+no_bert_hybrid, _ = read_sr_data('./test/data/nobert/hybrid_sr_res_no_bert.csv')
 
 no_embedding_bert, _ = read_sr_data('./test/data/noembedding/bert_sr_res_no_embedding.csv')
 no_embedding_embedding, _ = read_sr_data('./test/data/noembedding/vector_sr_res_no_embedding.csv')
 no_embedding_dict, _ = read_sr_data('./test/data/noembedding/dict_sr_res_no_embedding.csv')
 no_embedding_hownet, _ = read_sr_data('./test/data/noembedding/hownet_sr_res_no_embedding.csv')
-no_embedding_hybrid, _ = read_sr_data('./test/data/noembedding/mix_sr_res_no_embedding.csv')
+no_embedding_hybrid, _ = read_sr_data('./test/data/noembedding/hybrid_sr_res_no_embedding.csv')
 
 no_freq_bert, _ = read_sr_data('./test/data/nofreq/bert_sr_res_no_freq.csv')
 no_freq_embedding, _ = read_sr_data('./test/data/nofreq/vector_sr_res_no_freq.csv')
 no_freq_dict, _ = read_sr_data('./test/data/nofreq/dict_sr_res_no_freq.csv')
 no_freq_hownet, _ = read_sr_data('./test/data/nofreq/hownet_sr_res_no_freq.csv')
-no_freq_hybrid, _ = read_sr_data('./test/data/nofreq/mix_sr_res_no_freq.csv')
+no_freq_hybrid, _ = read_sr_data('./test/data/nofreq/hybrid_sr_res_no_freq.csv')
 
 no_chnum_bert, _ = read_sr_data('./test/data/nochnum/bert_sr_res_no_chnum.csv')
 no_chnum_embedding, _ = read_sr_data('./test/data/nochnum/vector_sr_res_no_chnum.csv')
 no_chnum_dict, _ = read_sr_data('./test/data/nochnum/dict_sr_res_no_chnum.csv')
 no_chnum_hownet, _ = read_sr_data('./test/data/nochnum/hownet_sr_res_no_chnum.csv')
-no_chnum_hybrid, _ = read_sr_data('./test/data/nochnum/mix_sr_res_no_chnum.csv')
+no_chnum_hybrid, _ = read_sr_data('./test/data/nochnum/hybrid_sr_res_no_chnum.csv')
 
 print('='*30 + 'Exp4' + '='*30 + '\n')
 print('='*30 + 'NOHOWNET' + '='*30 + '\n')

@@ -1,4 +1,3 @@
-import time
 import torch
 import numpy as np
 from transformers import BertTokenizer, BertForMaskedLM
@@ -123,7 +122,7 @@ def bert_generate(tokenizer, model, difficult_sentence, difficult_word, max_leng
 def main():
     DICT_PATH = './dict/HIT-dict=.txt'
     DATA_PATH = './dataset/annotation_data.csv'
-    OUTPUT_PATH = './data/mix_output.csv'
+    OUTPUT_PATH = './data/hybrid_output.csv'
     
     dict_path = DICT_PATH
     data_path = DATA_PATH

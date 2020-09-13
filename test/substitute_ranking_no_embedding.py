@@ -148,7 +148,7 @@ def main():
     VECTOR_RES_PATH = './data/vector_ss_res.csv'
     DICT_RES_PATH = './data/dict_ss_res.csv'
     HOWNET_RES_PATH = './data/hownet_ss_res.csv'
-    MIX_RES_PATH = './data/mix_ss_res.csv'
+    HYBRID_RES_PATH = './data/hybrid_ss_res.csv'
 
     SUBSTITUTION_NUM = 10
 
@@ -164,7 +164,7 @@ def main():
     vector_res_path = VECTOR_RES_PATH
     dict_res_path = DICT_RES_PATH
     hownet_res_path = HOWNET_RES_PATH
-    mix_res_path = MIX_RES_PATH
+    hybrid_res_path = HYBRID_RES_PATH
 
     substitution_num = SUBSTITUTION_NUM
 
@@ -182,11 +182,11 @@ def main():
     vector_res = read_ss_result(vector_res_path)
     dict_res = read_ss_result(dict_res_path)
     hownet_res = read_ss_result(hownet_res_path)
-    mix_res = read_ss_result(mix_res_path)
+    hybrid_res = read_ss_result(hybrid_res_path)
 
     row_lines, source_sentences, source_words = read_dataset(eval_file_path)
 
-    for row_line, source_sentence, source_word, bert_subs, vector_subs, dict_subs, hownet_subs, mix_subs in zip(row_lines, source_sentences, source_words, bert_res, vector_res, dict_res, hownet_res, mix_res):
+    for row_line, source_sentence, source_word, bert_subs, vector_subs, dict_subs, hownet_subs, hybrid_subs in zip(row_lines, source_sentences, source_words, bert_res, vector_res, dict_res, hownet_res, hybrid_res):
         # 全部运行可能耗时较长，建议注释部分代码块运行需要的测试
         if bert_subs[0] != 'NULL':
             bert_pre_word, bert_ss_sorted = substitute_ranking(row_line, model, tokenizer, hownet, source_sentence, source_word, bert_subs, word_freq_dict, substitution_num)
@@ -208,17 +208,17 @@ def main():
         else:
             hownet_pre_word = 'NULL'
             hownet_ss_sorted = ['NULL']
-        if mix_subs[0] != 'NULL':
-            mix_pre_word, mix_ss_sorted = substitute_ranking(row_line, model, tokenizer, hownet, source_sentence, source_word, mix_subs, word_freq_dict, substitution_num)
+        if hybrid_subs[0] != 'NULL':
+            hybrid_pre_word, hybrid_ss_sorted = substitute_ranking(row_line, model, tokenizer, hownet, source_sentence, source_word, hybrid_subs, word_freq_dict, substitution_num)
         else:
-            mix_pre_word = 'NULL'
-            mix_ss_sorted = ['NULL']
+            hybrid_pre_word = 'NULL'
+            hybrid_ss_sorted = ['NULL']
 
         save_result(row_line, bert_pre_word, bert_ss_sorted, './test/data/noembedding/bert_sr_res_no_embedding.csv')
         save_result(row_line, vector_pre_word, vector_ss_sorted, './test/data/noembedding/vector_sr_res_no_embedding.csv')
         save_result(row_line, dict_pre_word, dict_ss_sorted, './test/data/noembedding/dict_sr_res_no_embedding.csv')
         save_result(row_line, hownet_pre_word, hownet_ss_sorted, './test/data/noembedding/hownet_sr_res_no_embedding.csv')
-        save_result(row_line, mix_pre_word, mix_ss_sorted, './test/data/noembedding/mix_sr_res_no_embedding.csv')
+        save_result(row_line, hybrid_pre_word, hybrid_ss_sorted, './test/data/noembedding/hybrid_sr_res_no_embedding.csv')
 
 if __name__ == '__main__':
     main()
