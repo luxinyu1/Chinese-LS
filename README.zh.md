@@ -47,7 +47,7 @@ Chinese-LS使用了以下预训练模型:
 
 ### 运行
 
-事实上，我们已经为你执行了所有的代码并已将中间结果保存至```./data```目录下，你可以通过阅读我们的论文：[论文标题]()来了解代码和算法的细节。
+事实上，我们已经为你执行了所有的代码并已将中间结果保存至```./data```目录下，你可以通过阅读我们的论文：[Chinese Lexical Simplification:](https://arxiv.org/abs/2010.07048)来了解代码和算法的细节。
 
 如果你想要自己复现或者做一些修改，请按如下顺序执行代码：
 
@@ -88,7 +88,12 @@ Chinese-LS设计了5个实验来验证数据集的质量和比较各种方法，
 ## 引用
 
 ```
-
+@article{qiang2020chinese,
+  title={Chinese Lexical Simplification},
+  author={Qiang, Jipeng and Lu, Xinyu and Li, Yun and Yuan, Yunhao and Shi, Yang and Wu, Xindong},
+  journal={arXiv preprint arXiv:2010.07048},
+  year={2020}
+}
 ```
 
 ## 联系方式

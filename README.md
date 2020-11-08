@@ -32,7 +32,7 @@ The entire framework of Chinese-LS is shown below:
 - OpenHowNet==0.0.1a11
 - gensim==3.8.2
 
-The complete ```requirements.txt``` can been seen [here](requirements.txt).
+You can find the complete requirements [here](requirements.txt).
 
 ### Preparations
 
@@ -90,7 +90,12 @@ Chinese-LS designs 5 experiments to evaluate the quality of our dataset and the 
 ## Citation
 
 ```
-
+@article{qiang2020chinese,
+  title={Chinese Lexical Simplification},
+  author={Qiang, Jipeng and Lu, Xinyu and Li, Yun and Yuan, Yunhao and Shi, Yang and Wu, Xindong},
+  journal={arXiv preprint arXiv:2010.07048},
+  year={2020}
+}
 ```
 
 ## Contact

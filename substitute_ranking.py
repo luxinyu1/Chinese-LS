@@ -77,51 +77,6 @@ def cross_entropy_word(X, i, pos):
     loss -= np.log10(X[i, pos])
     return loss
 
-# def sent_loss(model, tokenizer, sentence):
-#     tokenize_input = tokenizer.tokenize(sentence)
-#     input_ids = tokenizer.encode(tokenize_input, return_tensors='pt')
-#     input_ids = input_ids.to('cuda')
-#     sentence_loss = 0
-#     for i in range(torch.numel(input_ids)):
-#         if input_ids[0][i] == tokenizer.sep_token_id or input_ids[0][i] == tokenizer.cls_token_id:
-#             continue
-#         orignial_id = input_ids[0][i].item()
-#         input_ids[0][i] = tokenizer.mask_token_id
-#         with torch.no_grad():
-#             outputs = model(input_ids)
-#         print(outputs[0].shape)
-#         word_loss = cross_entropy_word(logits[0][0].cpu().numpy(), i, input_ids[0][i].cpu().numpy())
-#         sentence_loss += word_loss
-#         input_ids[0][i] = orignial_id
-
-#     return np.exp(sentence_loss/len(sentence))
-
-# def sent_loss(model, tokenizer, sentence):
-#     CLS_TOKEN = '[CLS]'
-#     SEP_TOKEN = '[SEP]'
-#     tokenize_input = tokenizer.tokenize(sentence)
-#     print(tokenize_input)
-#     input_ids = tokenizer.encode(tokenize_input, return_tensors='pt')
-#     tokenize_input.insert(0, CLS_TOKEN)
-#     tokenize_input.append(SEP_TOKEN)
-#     print(input_ids)
-#     input_ids = input_ids.to('cuda')
-#     sentence_loss = 0
-#     for i, word in enumerate(tokenize_input):
-#         if word==CLS_TOKEN or word==SEP_TOKEN:
-#             continue
-#         orignial_word = tokenize_input[i]
-#         tokenize_input[i] = '[MASK]'
-#         mask_input = tokenizer.encode(tokenize_input, return_tensors='pt')
-#         print(mask_input)
-#         mask_input = mask_input.to('cuda')
-#         with torch.no_grad():
-#             logits = model(mask_input)
-#         word_loss = cross_entropy_word(logits[0][0].cpu().numpy(), i, input_ids[0][i].cpu().numpy())
-#         sentence_loss += word_loss
-#         tokenize_input[i] = orignial_word
-#     return np.exp(sentence_loss/len(sentence))
-
 def sent_loss(model, tokenizer, sentence):
     tokenize_input = tokenizer.tokenize(sentence)
 
