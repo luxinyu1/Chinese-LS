@@ -47,7 +47,7 @@ Chinese-LS使用了以下预训练模型:
 
 ### 运行
 
-事实上，我们已经为你执行了所有的代码并已将中间结果保存至```./data```目录下，你可以通过阅读我们的论文：[Chinese Lexical Simplification:](https://arxiv.org/abs/2010.07048)来了解代码和算法的细节。
+事实上，我们已经为你执行了所有的代码并已将中间结果保存至```./data```目录下，你可以通过阅读我们的论文：[Chinese Lexical Simplification](https://arxiv.org/abs/2010.07048)来了解代码和算法的细节。
 
 如果你想要自己复现或者做一些修改，请按如下顺序执行代码：
 
