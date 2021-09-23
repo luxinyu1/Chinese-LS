@@ -1,6 +1,12 @@
+# This file has been tested in transformers==3.5.0
+
+import logging
+import argparse
 import torch
 import numpy as np
-from transformers import BertTokenizer, BertForMaskedLM
+from transformers import AutoConfig, AutoTokenizer, AutoModelForMaskedLM, BertTokenizer
+
+logger = logging.getLogger(__name__)
 
 def read_eval_dataset(data_path):
     sentences = []
@@ -25,10 +31,10 @@ def read_dict(dict_path):
     return dict
 
 def encoder(tokenizer, sequence_a, sequence_b, max_length):
-    sequence_dict = tokenizer.encode_plus(sequence_a, sequence_b, max_length=max_length, pad_to_max_length=True, return_tensors='pt')
+    sequence_dict = tokenizer.encode_plus(sequence_a, sequence_b, max_length=max_length, padding=True, return_tensors='pt')
     return sequence_dict
 
-def cut_out_sent(sentence, start_index, end_index, window):
+def truncate(sentence, start_index, end_index, window):
     # extract words around the content word
     len_sent = len(sentence)
     len_word = end_index - start_index
@@ -52,64 +58,51 @@ def predict_char(tokenizer, model, sentence, mask_sentence, max_length, k):
         outputs = model(input_ids, attention_masks, token_type_ids) # Return type: tuple(torch.FloatTensor) comprising various elements depending on the configuration (BertConfig) and inputs
     token_logits = outputs[0]
     mask_token_logits = token_logits[0, masked_index, :]
+    mask_token_probs = mask_token_logits.softmax(dim=0)
     top_k_ids = torch.topk(mask_token_logits, k).indices.tolist()
     logits = mask_token_logits[top_k_ids]
+    probs = mask_token_probs[top_k_ids]
     top_k_tokens = tokenizer.convert_ids_to_tokens(top_k_ids)
-    return logits, top_k_tokens
+    return probs, top_k_tokens
 
 def get_idiom_subs(tokenizer, model, source_sent, mask_word, max_length):
     mask_sentence = source_sent.replace(mask_word, '[MASK]'*4)
-    logits, top_5_tokens = predict_char(tokenizer, model, source_sent, mask_sentence, max_length, 5)
+    probs, top_5_tokens = predict_char(tokenizer, model, source_sent, mask_sentence, max_length, 5)
     for _ in range(3):
         for i in range(5):
             temp_sentence = mask_sentence.replace('[MASK]', top_5_tokens[i], 1)
-            logits_sub, top_token = predict_char(tokenizer, model, source_sent, temp_sentence, max_length, 1)
-            logits[i] *= logits_sub[0]
+            probs_sub, top_token = predict_char(tokenizer, model, source_sent, temp_sentence, max_length, 1)
+            probs[i] *= probs_sub[0]
             top_5_tokens[i] += top_token[0]
-    return logits, top_5_tokens
+    return probs, top_5_tokens
 
 def get_word_subs(tokenizer, model, source_sent, mask_word, max_length):
     mask_sentence = source_sent.replace(mask_word, '[MASK]'*2)
-    logits_first, top_5_tokens = predict_char(tokenizer, model, source_sent, mask_sentence, max_length, 5)
+    probs_first, top_5_tokens = predict_char(tokenizer, model, source_sent, mask_sentence, max_length, 5)
     substitution_words = []
-    word_logits = []
+    word_probs = []
     for i in range(5):
         temp_sentence = mask_sentence.replace('[MASK]', top_5_tokens[i], 1)
-        logits_second, top_3_tokens = predict_char(tokenizer, model, source_sent, temp_sentence, max_length, 3)
-        logits = (logits_first[i] * logits_second).tolist()
+        probs_second, top_3_tokens = predict_char(tokenizer, model, source_sent, temp_sentence, max_length, 3)
+        probs = [(probs_first[i] * next_prob).item() for next_prob in probs_second]
         words = [top_5_tokens[i] + next_char for next_char in top_3_tokens]
-        word_logits += logits
+        word_probs += probs
         substitution_words += words
-    return word_logits, substitution_words
+
+    return word_probs, substitution_words
 
 def get_char_subs(tokenizer, model, source_sent, mask_char, max_length, k):
     mask_sentence = source_sent.replace(mask_char, '[MASK]')
-    logits, top_k_tokens = predict_char(tokenizer, model, source_sent, mask_sentence, max_length, k)
-    logits = logits.tolist()
-    return logits, top_k_tokens
+    probs, top_k_tokens = predict_char(tokenizer, model, source_sent, mask_sentence, max_length, k)
+    probs = [prob.item() for prob in probs]
+    return probs, top_k_tokens
 
 def save_results(results, output_path):
-    with open(output_path, 'a', encoding='utf-8') as f_result:
-        f_result.write(' '.join(results) + '\n')
+    with open(output_path, 'w+', encoding='utf-8') as f_result:
+        for r in results:
+            f_result.write(' '.join(r) + '\n')
 
-def main():
-    # file-path
-    MODEL_CACHE = './model/bert-base-chinese'
-    EVAL_FILE = './dataset/annotation_data.csv'
-    OUTPUT_PATH = './data/bert_output.csv'
-    # hyperparameter
-    MAX_LENGH = 128
-    SUBSITUTION_NUM = 10
-
-    model_cache = MODEL_CACHE
-    eval_file = EVAL_FILE
-    output_path = OUTPUT_PATH
-    max_length = MAX_LENGH
-    substitution_num = SUBSITUTION_NUM
-
-    print('loading model...')
-    tokenizer = BertTokenizer.from_pretrained(model_cache)
-    model = BertForMaskedLM.from_pretrained(model_cache)
+def generate(model, tokenizer, eval_file, max_length):
     
     sentences, mask_words = read_eval_dataset(eval_file)
 
@@ -119,16 +112,15 @@ def main():
     results = []
 
     for i in range(len(sentences)):
-        print(sentences[i], mask_words[i])
         len_word = len(mask_words[i])
         if len(sentences[i]) > int((max_length-3) / 2):
             start_index = sentences[i].index(mask_words[i])
             end_index = start_index + len_word
-            sentences[i] = cut_out_sent(sentences[i], start_index, end_index, int((max_length-3) / 2))
+            sentences[i] = truncate(sentences[i], start_index, end_index, int((max_length-3) / 2))
         len_sentence = len(sentences[i])
-        logits, substitutions = get_word_subs(tokenizer, model, sentences[i], mask_words[i], max_length)
+        probs, substitutions = get_word_subs(tokenizer, model, sentences[i], mask_words[i], max_length)
         if len_word == 4:
-            idiom_logits, idiom_substitutions = get_idiom_subs(tokenizer, model, sentences[i], mask_words[i], max_length)
+            _, idiom_substitutions = get_idiom_subs(tokenizer, model, sentences[i], mask_words[i], max_length)
             substitutions.extend(idiom_substitutions)
         if len_word == 2:
             _, one_char_word_substitutions = get_char_subs(tokenizer, model, sentences[i], mask_words[i], max_length, 2)
@@ -136,8 +128,51 @@ def main():
         if len_word == 1:
             _, one_char_word_substitutions = get_char_subs(tokenizer, model, sentences[i], mask_words[i], max_length, 3)
             substitutions.extend(one_char_word_substitutions)
-        print(substitutions)
-        save_results(substitutions, output_path)
+        results.append(substitutions)
+    
+    return results
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bert_model", default=None, type=str,
+                        help="BERT pre-trained model name")
+    parser.add_argument("--model_cache", default=None, type=str,
+                        help="Where do you want to store the pre-trained models downloaded from s3")
+    parser.add_argument("--eval_file", default=None, type=str, required=True,
+                        help="The path to the dataset")
+    parser.add_argument("--output_path", default=None, type=str, required=True,
+                        help="The output path where the model predictions will be written")
+    parser.add_argument("--max_seq_length",
+                        default=128,
+                        type=int,
+                        help="The maximum total input sequence length after WordPiece tokenization. \n"
+                            "Sequences longer than this will be truncated, and sequences shorter \n"
+                            "than this will be padded.")
+
+    args = parser.parse_args()
+
+    model_name = args.bert_model
+    model_cache = args.model_cache
+    eval_file = args.eval_file
+    output_path = args.output_path
+    max_length = args.max_seq_length
+
+    logger.info("loading model...")
+
+    if model_cache:
+        tokenizer = AutoTokenizer.from_pretrained(model_cache)
+        model = AutoModelForMaskedLM.from_pretrained(model_cache)
+    elif model_name:
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        model = AutoModelForMaskedLM.from_pretrained(model_name)
+    else:
+        raise(ValueError("At least one of bert_model and model_cache should be given"))
+    
+    print(model)
+    print(tokenizer)
+
+    results = generate(model, tokenizer, eval_file, max_length)
+    save_results(results, output_path)
 
 if __name__ == '__main__':
     main()

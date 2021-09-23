@@ -25,7 +25,7 @@ Chinese-LS的整体框架结构如下图所示:
 ### 运行环境
 
 - Python==3.7.6
-- transformers==2.9.0
+- transformers==3.5.0
 - numpy==1.18.1
 - jieba==0.42.1
 - torch==1.4.0
@@ -42,6 +42,10 @@ Chinese-LS使用了以下预训练模型:
 
 - Word2Vec模型： [Chinese-Word-Vector](https://github.com/Embedding/Chinese-Word-Vectors) (Mixed-large)
 - BERT-base, Chinese ([transformers](https://huggingface.co/bert-base-chinese)) 
+- Macbert-base, Chinese ([huggingface](https://huggingface.co/hfl/chinese-macbert-base))
+- BERT-wwm-ext, Chinese ([huggingface](https://huggingface.co/hfl/chinese-bert-wwm-ext)) 
+- RoBERTa-wwm-ext, Chinese ([huggingface](https://huggingface.co/hfl/chinese-roberta-wwm-ext)) 
+- ERNIE ([PaddlePaddle](https://baidu-nlp.bj.bcebos.com/ERNIE_stable-1.0.1.tar.gz))
 
 下载完成后，请将模型文件存放至```./model```目录下。
 
@@ -63,7 +67,7 @@ Chinese-LS使用了以下预训练模型:
 
 3. 使用基于预训练语言模型的方法生成
 
-	运行```bert_generate.py```
+	运行```bert_generate.sh```
 
 4. 使用基于义原的方法生成
 
@@ -88,15 +92,21 @@ Chinese-LS设计了5个实验来验证数据集的质量和比较各种方法，
 ## 引用
 
 ```
-@article{qiang2020chinese,
-  title={Chinese Lexical Simplification},
-  author={Qiang, Jipeng and Lu, Xinyu and Li, Yun and Yuan, Yunhao and Shi, Yang and Wu, Xindong},
-  journal={arXiv preprint arXiv:2010.07048},
-  year={2020}
+@article{qiang2021chinese,
+    title={Chinese Lexical Simplification},
+    author={Qiang, Jipeng and Lu, Xinyu and Li, Yun and Yuan, Yun-Hao and Wu, Xindong},
+    journal={IEEE/ACM Transactions on Audio, Speech, and Language Processing},
+    year={2021},
+    volume={29},
+    pages={1819-1828},
+    doi={10.1109/TASLP.2021.3078361},
+    publisher={IEEE}
 }
 ```
 
 ## 联系方式
+
+我们仍在努力改善该仓库，如果您遇到了问题或者发现了bug，欢迎提出issue和Pull Request。
 
 Email: luxinyu12345@foxmail.com
 

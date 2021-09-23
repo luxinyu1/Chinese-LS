@@ -48,6 +48,7 @@ def substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, so
     sim_ranks = [sim_scores_sorted.index(x) + 1 for x in sim_scores]
     hownet_scores_sorted = sorted(hownet_scores, reverse=True)
     hownet_ranks = [hownet_scores_sorted.index(x) + 1 for x in hownet_scores]
+    # TODO: rank normalization
     all_ranks = [[substitution_word, loss+freq+sim+hownet] for substitution_word, loss, freq, sim, hownet in zip(substitution_words, loss_ranks, freq_ranks, sim_ranks, hownet_ranks)]
     ss_sorted = sorted(all_ranks, key=lambda x:x[1])
     ss_sorted = [x[0] for x in ss_sorted]
@@ -60,7 +61,6 @@ def substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, so
         pre_word = ss_sorted[1]
     else:
         pre_word = ss_sorted[0]
-    print(pre_word, ss_sorted)
 
     return pre_word, ss_sorted[:substitution_num:]
 
@@ -133,12 +133,15 @@ def read_dataset(data_path):
     return row_lines, sentences, words
 
 def read_dict(dict_path):
-    dict = {}
-    with open(dict_path, 'r', encoding='utf-8') as f_dict:
-        for line in f_dict:
-            key, pingyin, value = line.strip().split('\t')
-            dict[key] = value
-    return dict
+    word_freq_dict = {}
+    with open(dict_path, 'r', encoding='utf-8') as f_freq:
+        for line in f_freq:
+            key, _, value = line.strip().split('\t')
+            if key not in word_freq_dict:
+                word_freq_dict[key] = value
+            elif int(value) < int(word_freq_dict[key]):
+                word_freq_dict[key] = value
+    return word_freq_dict
 
 def save_result(row_line, pre_word, ss_sorted, path):
     with open(path, 'a', encoding='utf-8') as f_ss_res:
@@ -153,7 +156,13 @@ def main():
 
     EVAL_FILE_PATH = './dataset/annotation_data.csv'
     BERT_RES_PATH = './data/bert_ss_res.csv'
-    # ERNIE_RES_PATH = './data/ernie_output.csv'
+    BERT_NO_AUTOREGRESSIVE_RES_PATH = './data/bert_no_autoregressive_ss_res.csv'
+    BERT_WWM_RES_PATH = './data/bert_wwm_ss_res.csv'
+    BERT_WWM_EXT_RES_PATH = './data/bert_wwm_ext_ss_res.csv'
+    ERNIE_RES_PATH = './data/ernie_ss_res.csv'
+    MACBERT_RES_PATH = './data/macbert_base_ss_res.csv'
+    ROBERTA_RES_PATH = './data/roberta_wwm_ext_ss_res.csv'
+    ELECTRA_RES_PATH = './data/electra_ss_res.csv'
     VECTOR_RES_PATH = './data/vector_ss_res.csv'
     DICT_RES_PATH = './data/dict_ss_res.csv'
     HOWNET_RES_PATH = './data/hownet_ss_res.csv'
@@ -169,7 +178,13 @@ def main():
     eval_file_path = EVAL_FILE_PATH
 
     bert_res_path = BERT_RES_PATH
-    # ernie_res_path = ERNIE_RES_PATH
+    bert_no_autoregressive_res_path = BERT_NO_AUTOREGRESSIVE_RES_PATH
+    bert_wwm_res_path = BERT_WWM_EXT_RES_PATH
+    bert_wwm_ext_res_path = BERT_WWM_EXT_RES_PATH
+    ernie_res_path = ERNIE_RES_PATH
+    macbert_res_path = MACBERT_RES_PATH
+    roberta_res_path = ROBERTA_RES_PATH
+    electra_res_path = ELECTRA_RES_PATH
     vector_res_path = VECTOR_RES_PATH
     dict_res_path = DICT_RES_PATH
     hownet_res_path = HOWNET_RES_PATH
@@ -190,6 +205,13 @@ def main():
     word_freq_dict = read_dict(word_freq_dict)
 
     bert_res = read_ss_result(bert_res_path)
+    bert_no_autoregressive_res = read_ss_result(bert_no_autoregressive_res_path)
+    bert_wwm_res = read_ss_result(bert_wwm_res_path)
+    bert_wwm_ext_res = read_ss_result(bert_wwm_ext_res_path)
+    ernie_res = read_ss_result(ernie_res_path)
+    macbert_res = read_ss_result(macbert_res_path)
+    roberta_res = read_ss_result(roberta_res_path)
+    electra_res = read_ss_result(electra_res_path)
     vector_res = read_ss_result(vector_res_path)
     dict_res = read_ss_result(dict_res_path)
     hownet_res = read_ss_result(hownet_res_path)
@@ -197,7 +219,37 @@ def main():
 
     row_lines, source_sentences, source_words = read_dataset(eval_file_path)
 
-    for row_line, source_sentence, source_word, bert_subs, vector_subs, dict_subs, hownet_subs, hybrid_subs in zip(row_lines, source_sentences, source_words, bert_res, vector_res, dict_res, hownet_res, hybrid_res):
+    for (row_line,
+        source_sentence, 
+        source_word, 
+        bert_subs, 
+        bert_no_autoregressive_subs,
+        bert_wwm_subs,
+        bert_wwm_ext_subs, 
+        ernie_subs,
+        macbert_subs,
+        roberta_subs,
+        electra_subs,
+        vector_subs, 
+        dict_subs, 
+        hownet_subs, 
+        hybrid_subs) in (
+        zip(row_lines, 
+        source_sentences, 
+        source_words, 
+        bert_res,
+        bert_no_autoregressive_res,
+        bert_wwm_res, 
+        bert_wwm_ext_res, 
+        ernie_res,
+        macbert_res,
+        roberta_res,
+        electra_res,
+        vector_res, 
+        dict_res, 
+        hownet_res, 
+        hybrid_res)
+        ):
         # 全部运行可能耗时较长，建议注释部分代码块运行需要的测试
         # It may take a long time to run all the code blocks. We recommend to annotate some code blocks to run the required tests
         if bert_subs[0] != 'NULL':
@@ -205,6 +257,41 @@ def main():
         else:
             bert_pre_word = 'NULL'
             bert_ss_sorted = ['NULL']
+        # if bert_no_autoregressive_subs[0] != 'NULL':
+        #     bert_no_autoregressive_pre_word, bert_no_autoregressive_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, bert_no_autoregressive_subs, word_freq_dict, substitution_num)
+        # else:
+        #     bert_no_autoregressive_pre_word = 'NULL'
+        #     bert_no_autoregressive_ss_sorted = ['NULL']
+        # if bert_wwm_subs[0] != 'NULL':
+        #     bert_wwm_pre_word, bert_wwm_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, bert_wwm_subs, word_freq_dict, substitution_num)
+        # else:
+        #     bert_wwm_pre_word = 'NULL'
+        #     bert_wwm_ss_sorted = ['NULL']
+        # if bert_wwm_ext_subs[0] != 'NULL':
+        #     bert_wwm_ext_pre_word, bert_wwm_ext_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, bert_wwm_ext_subs, word_freq_dict, substitution_num)
+        # else:
+        #     bert_wwm_ext_pre_word = 'NULL'
+        #     bert_wwm_ext_ss_sorted = ['NULL']
+        # if ernie_subs[0] != 'NULL':
+        #     ernie_pre_word, ernie_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, ernie_subs, word_freq_dict, substitution_num)
+        # else:
+        #     ernie_pre_word = 'NULL'
+        #     ernie_ss_sorted = ['NULL']
+        # if roberta_subs[0] != 'NULL':
+        #     roberta_pre_word, roberta_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, roberta_subs, word_freq_dict, substitution_num)
+        # else:
+        #     ernie_pre_word = 'NULL'
+        #     ernie_ss_sorted = ['NULL']
+        # if macbert_subs[0] != 'NULL':
+        #     macbert_pre_word, macbert_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, macbert_subs, word_freq_dict, substitution_num)
+        # else:
+        #     macbert_pre_word = 'NULL'
+        #     macbert_ss_sorted = ['NULL']
+        # if electra_subs[0] != 'NULL':
+        #     electra_pre_word, electra_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, electra_subs, word_freq_dict, substitution_num)
+        # else:
+        #     eletra_pre_word = 'NULL'
+        #     electra_ss_sorted = ['NULL']
         if vector_subs[0] != 'NULL':
             vector_pre_word, vector_ss_sorted = substitute_ranking(row_line, model_word2vector, model, tokenizer, hownet, source_sentence, source_word, vector_subs, word_freq_dict, substitution_num)
         else:
@@ -227,7 +314,13 @@ def main():
             hybrid_ss_sorted = ['NULL']
 
         save_result(row_line, bert_pre_word, bert_ss_sorted, './data/bert_sr_res.csv')
+        # save_result(row_line, bert_no_autoregressive_pre_word, bert_no_autoregressive_ss_sorted, './data/bert_no_autoregressive_sr_res.csv')
+        # save_result(row_line, bert_wwm_pre_word, bert_wwm_ss_sorted, './data/bert_wwm_sr_res.csv')
+        # save_result(row_line, bert_wwm_ext_pre_word, bert_wwm_ext_ss_sorted, './data/bert_wwm_ext_sr_res.csv')
         # save_result(row_line, ernie_pre_word, ernie_ss_sorted, './data/ernie_sr_res.csv')
+        # save_result(row_line, roberta_pre_word, roberta_ss_sorted, './data/roberta_wwm_ext_sr_res.csv')
+        # save_result(row_line, macbert_pre_word, macbert_ss_sorted, './data/macbert_sr_res.csv')
+        # save_result(row_line, electra_pre_word, electra_ss_sorted, './data/electra_sr_res.csv')
         save_result(row_line, vector_pre_word, vector_ss_sorted, './data/vector_sr_res.csv')
         save_result(row_line, dict_pre_word, dict_ss_sorted, './data/dict_sr_res.csv')
         save_result(row_line, hownet_pre_word, hownet_ss_sorted, './data/hownet_sr_res.csv')

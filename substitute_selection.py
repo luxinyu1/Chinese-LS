@@ -58,7 +58,14 @@ def save_results(results, output_path):
 DATASET_PATH = './dataset/annotation_data.csv'
 
 BERT_RES_PATH = './data/bert_output.csv'
-# ERNIE_RES_PATH = './data/ernie_output.csv'
+BERT_NO_AUTOREGRESSIVE_RES_PATH = './data/bert_no_autoregressive_output.csv'
+ERNIE_RES_PATH = './data/ernie_output.csv'
+BERT_BI_RES_PATH = './data/bert_bi_output.csv'
+BERT_WWM_RES_PATH = './data/bert_wwm_output.csv'
+BERT_WWM_EXT_RES_PATH = './data/bert_wwm_ext_output.csv'
+ROBERTA_WWM_EXT_RES_PATH = './data/roberta_wwm_ext_output.csv'
+MACBERT_RES_PATH = './data/macbert_output.csv'
+ELECTRA_RES_PATH = './data/electra_output.csv'
 VECTOR_RES_PATH = './data/vector_output.csv'
 DICT_RES_PATH = './data/dict_output.csv'
 HOWNET_RES_PATH = './data/hownet_output.csv'
@@ -69,7 +76,14 @@ WORD_FREQ_DICT = './dict/modern_chinese_word_freq.txt'
 dataset_path = DATASET_PATH
 
 bert_res_path = BERT_RES_PATH
-# ernie_res_path = ERNIE_RES_PATH
+bert_no_autoregressive_res_path = BERT_NO_AUTOREGRESSIVE_RES_PATH
+ernie_res_path = ERNIE_RES_PATH
+bert_bi_res_path = BERT_BI_RES_PATH
+bert_wwm_res_path = BERT_WWM_RES_PATH
+bert_wwm_ext_res_path = BERT_WWM_EXT_RES_PATH
+roberta_wwm_ext_res_path = ROBERTA_WWM_EXT_RES_PATH
+macbert_res_path = MACBERT_RES_PATH
+electra_res_path = ELECTRA_RES_PATH
 vector_res_path = VECTOR_RES_PATH
 dict_res_path = DICT_RES_PATH
 hownet_res_path = HOWNET_RES_PATH
@@ -81,18 +95,42 @@ word_list = read_dict(word_freq_dict)
 origin_words = read_dataset(dataset_path)
 
 bert_res = read_generate_result(bert_res_path)
+bert_no_autoregressive_res = read_generate_result(bert_no_autoregressive_res_path)
+ernie_res = read_generate_result(ernie_res_path)
+bert_bi_res = read_generate_result(bert_bi_res_path)
+bert_wwm_res = read_generate_result(bert_wwm_res_path)
+bert_wwm_ext_res = read_generate_result(bert_wwm_ext_res_path)
+roberta_wwm_ext_res = read_generate_result(roberta_wwm_ext_res_path)
+macbert_res = read_generate_result(macbert_res_path)
+electra_res = read_generate_result(electra_res_path)
 vector_res = read_generate_result(vector_res_path)
 dict_res = read_generate_result(dict_res_path)
 hownet_res = read_generate_result(hownet_res_path)
 hybrid_res = read_generate_result(hybrid_res_path)
 
 valid_bert_res = substitute_selection(bert_res, word_list, origin_words)
+valid_bert_no_autoregressive_res = substitute_selection(bert_no_autoregressive_res, word_list, origin_words)
+valid_bert_wwm_res = substitute_selection(bert_wwm_res, word_list, origin_words)
+valid_bert_wwm_ext_res = substitute_selection(bert_wwm_ext_res, word_list, origin_words)
+valid_bert_bi_res = substitute_selection(bert_bi_res, word_list, origin_words)
+valid_ernie_res = substitute_selection(ernie_res, word_list, origin_words)
+valid_roberta_wwm_ext_res = substitute_selection(roberta_wwm_ext_res, word_list, origin_words)
+valid_macbert_res = substitute_selection(macbert_res, word_list, origin_words)
+valid_electra_res = substitute_selection(electra_res, word_list, origin_words)
 valid_vector_res = substitute_selection(vector_res, word_list, origin_words)
 valid_dict_res = substitute_selection(dict_res, word_list, origin_words)
 valid_hownet_res = substitute_selection(hownet_res, word_list, origin_words) 
 valid_hybrid_res = substitute_selection(hybrid_res, word_list, origin_words)
 
 save_results(valid_bert_res, './data/bert_ss_res.csv')
+save_results(valid_bert_no_autoregressive_res, './data/bert_no_autoregressive_ss_res.csv')
+save_results(valid_bert_wwm_res, './data/bert_wwm_ss_res.csv')
+save_results(valid_bert_bi_res, './data/bert_bi_ss_res.csv')
+save_results(valid_ernie_res, './data/ernie_ss_res.csv')
+save_results(valid_bert_wwm_ext_res, './data/bert_wwm_ext_ss_res.csv')
+save_results(valid_roberta_wwm_ext_res, './data/roberta_wwm_ext_ss_res.csv')
+save_results(valid_macbert_res, './data/macbert_base_ss_res.csv')
+save_results(valid_electra_res, './data/electra_ss_res.csv')
 save_results(valid_vector_res, './data/vector_ss_res.csv')
 save_results(valid_dict_res, './data/dict_ss_res.csv')
 save_results(valid_hownet_res, './data/hownet_ss_res.csv')

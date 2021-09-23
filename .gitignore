@@ -1,1 +1,8 @@
-bert_example.py
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# legacy files
+/legacy/

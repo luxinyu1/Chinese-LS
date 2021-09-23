@@ -25,7 +25,7 @@ The entire framework of Chinese-LS is shown below:
 ### Requirements
 
 - Python==3.7.6
-- transformers==2.9.0
+- transformers==3.5.0
 - numpy==1.18.1
 - jieba==0.42.1
 - torch==1.4.0
@@ -41,7 +41,11 @@ You can find the complete requirements [here](requirements.txt).
 Chinese-LS uses the following pretrained models:
 
 - Word2Vec model: [Chinese-Word-Vector](https://github.com/Embedding/Chinese-Word-Vectors) (Mixed-large)
-- BERT-base, Chinese ([transformers](https://huggingface.co/bert-base-chinese)) 
+- BERT-base, Chinese ([huggingface](https://huggingface.co/bert-base-chinese))
+- macbert-base, Chinese ([huggingface](https://huggingface.co/hfl/chinese-macbert-base))
+- bert-wwm-ext, Chinese ([huggingface](https://huggingface.co/hfl/chinese-bert-wwm-ext)) 
+- roberta-wwm-ext, Chinese ([huggingface](https://huggingface.co/hfl/chinese-roberta-wwm-ext)) 
+- ERNIE ([PaddlePaddle](https://baidu-nlp.bj.bcebos.com/ERNIE_stable-1.0.1.tar.gz))
 
 Please place the models under the ```./model``` directory after downloading.
 
@@ -65,7 +69,7 @@ If you want to run the codes for reproduction, please execute them in the follow
 
 3. Pretrained language model based-approach
 
-	Run ```bert_generate.py```
+	Run ```bert_generate.sh```
 
 4. Sememe based-approach
 
@@ -90,15 +94,21 @@ Chinese-LS designs 5 experiments to evaluate the quality of our dataset and the 
 ## Citation
 
 ```
-@article{qiang2020chinese,
-  title={Chinese Lexical Simplification},
-  author={Qiang, Jipeng and Lu, Xinyu and Li, Yun and Yuan, Yunhao and Shi, Yang and Wu, Xindong},
-  journal={arXiv preprint arXiv:2010.07048},
-  year={2020}
+@article{qiang2021chinese,
+    title={Chinese Lexical Simplification},
+    author={Qiang, Jipeng and Lu, Xinyu and Li, Yun and Yuan, Yun-Hao and Wu, Xindong},
+    journal={IEEE/ACM Transactions on Audio, Speech, and Language Processing},
+    year={2021},
+    volume={29},
+    pages={1819-1828},
+    doi={10.1109/TASLP.2021.3078361},
+    publisher={IEEE}
 }
 ```
 
 ## Contact
+
+This repo may still contain bugs and we are working on improving the reproductivity. Welcome to open an issue or submit a Pull Request to report/fix the bugs.
 
 Email: luxinyu12345@foxmail.com
 

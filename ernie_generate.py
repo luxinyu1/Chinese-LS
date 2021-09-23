@@ -84,41 +84,30 @@ for sentence, difficult_word in zip(sentences, difficult_words):
     mask_id = tokenizer.mask_id
     mask_index = np.argwhere(ids==mask_id)[0]
     logits = ernie(src_ids)
-    _, top_10_tokens = L.topk(logits, 10)
+    _, top_5_tokens = L.topk(logits, 5)
     # print(top_k_tokens[1].numpy())
     substitution_words = []
-    for token in top_10_tokens[0].numpy():
+    for token in top_5_tokens[0].numpy():
         first_char = str(rev_lookup(token))
         ids[mask_index] = token
         # sep_index = np.argwhere(ids==tokenizer.sep_id)[0][0]
         # second_ids = ids[sep_index::]
         # second_ids[0:0] = tokenizer.cls_id
         second_ids = D.to_variable(np.expand_dims(ids, 0))
-        logits = ernie(second_ids).numpy()
-        top_token = np.argmax(logits, -1)
-        second_char = str(rev_lookup(top_token[0]))
-        substitution_words.append(first_char+second_char)
-    for token in top_10_tokens[1].numpy():
-        second_char = str(rev_lookup(token))
-        ids[mask_index] = tokenizer.mask_id
-        ids[mask_index+1] = token
-        # sep_index = np.argwhere(ids==tokenizer.sep_id)[0][0]
-        # second_ids = ids[sep_index::]
-        # second_ids[0:0] = tokenizer.cls_id
-        second_ids = D.to_variable(np.expand_dims(ids, 0))
-        logits = ernie(second_ids).numpy()
-        top_token = np.argmax(logits, -1)
-        first_char = str(rev_lookup(top_token[0]))
-        substitution_words.append(first_char+second_char)
+        logits = ernie(second_ids)
+        _, top_3_tokens = L.topk(logits, 3)
+        for _token in top_3_tokens[0].numpy():
+            second_char = str(rev_lookup(_token))
+            substitution_words.append(first_char+second_char)
     # 字预测
-    if len(difficult_word) == 1:
+    if len(difficult_word) == 1 or len(difficult_word) == 2:
         ids, _ = tokenizer.encode(sentence, pre_process(sentence, difficult_word, 1))
         src_ids = D.to_variable(np.expand_dims(ids, 0))
         mask_id = tokenizer.mask_id
         mask_index = np.argwhere(ids==mask_id)[0]
         logits = ernie(src_ids)
-        _, top_5_tokens = L.topk(logits, 5)
-        chars = [str(rev_lookup(token)) for token in top_5_tokens[0].numpy()]
+        _, top_3_tokens = L.topk(logits, 3)
+        chars = [str(rev_lookup(token)) for token in top_3_tokens[0].numpy()]
         substitution_words.extend(chars)
     # 成语预测
     if len(difficult_word) == 4:
@@ -154,5 +143,4 @@ for sentence, difficult_word in zip(sentences, difficult_words):
             top_token = np.argmax(logits, -1)
             forth_char = str(rev_lookup(top_token[0]))
             substitution_words.append(first_char+second_char+third_char+forth_char)
-    print(substitution_words)
     save_results(substitution_words, output_path)
