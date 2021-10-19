@@ -53,7 +53,7 @@ Please place the models under the ```./model``` directory after downloading.
 
 We have already executed the codes for you and intermediate results can be found in ```./data```.
 
-You could check out the details of codes and algorithms from our paper: [Chinese Lexical Simplification](https://arxiv.org/abs/2010.07048)
+You could check out the details of codes and algorithms from our paper: [Chinese Lexical Simplification](https://ieeexplore.ieee.org/abstract/document/9439908)
 
 If you want to run the codes for reproduction, please execute them in the following order: 
 
