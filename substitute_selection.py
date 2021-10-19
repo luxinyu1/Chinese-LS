@@ -60,7 +60,6 @@ DATASET_PATH = './dataset/annotation_data.csv'
 BERT_RES_PATH = './data/bert_output.csv'
 BERT_NO_AUTOREGRESSIVE_RES_PATH = './data/bert_no_autoregressive_output.csv'
 ERNIE_RES_PATH = './data/ernie_output.csv'
-BERT_BI_RES_PATH = './data/bert_bi_output.csv'
 BERT_WWM_RES_PATH = './data/bert_wwm_output.csv'
 BERT_WWM_EXT_RES_PATH = './data/bert_wwm_ext_output.csv'
 ROBERTA_WWM_EXT_RES_PATH = './data/roberta_wwm_ext_output.csv'
@@ -78,7 +77,6 @@ dataset_path = DATASET_PATH
 bert_res_path = BERT_RES_PATH
 bert_no_autoregressive_res_path = BERT_NO_AUTOREGRESSIVE_RES_PATH
 ernie_res_path = ERNIE_RES_PATH
-bert_bi_res_path = BERT_BI_RES_PATH
 bert_wwm_res_path = BERT_WWM_RES_PATH
 bert_wwm_ext_res_path = BERT_WWM_EXT_RES_PATH
 roberta_wwm_ext_res_path = ROBERTA_WWM_EXT_RES_PATH
@@ -97,7 +95,6 @@ origin_words = read_dataset(dataset_path)
 bert_res = read_generate_result(bert_res_path)
 bert_no_autoregressive_res = read_generate_result(bert_no_autoregressive_res_path)
 ernie_res = read_generate_result(ernie_res_path)
-bert_bi_res = read_generate_result(bert_bi_res_path)
 bert_wwm_res = read_generate_result(bert_wwm_res_path)
 bert_wwm_ext_res = read_generate_result(bert_wwm_ext_res_path)
 roberta_wwm_ext_res = read_generate_result(roberta_wwm_ext_res_path)
@@ -112,7 +109,6 @@ valid_bert_res = substitute_selection(bert_res, word_list, origin_words)
 valid_bert_no_autoregressive_res = substitute_selection(bert_no_autoregressive_res, word_list, origin_words)
 valid_bert_wwm_res = substitute_selection(bert_wwm_res, word_list, origin_words)
 valid_bert_wwm_ext_res = substitute_selection(bert_wwm_ext_res, word_list, origin_words)
-valid_bert_bi_res = substitute_selection(bert_bi_res, word_list, origin_words)
 valid_ernie_res = substitute_selection(ernie_res, word_list, origin_words)
 valid_roberta_wwm_ext_res = substitute_selection(roberta_wwm_ext_res, word_list, origin_words)
 valid_macbert_res = substitute_selection(macbert_res, word_list, origin_words)
@@ -125,7 +121,6 @@ valid_hybrid_res = substitute_selection(hybrid_res, word_list, origin_words)
 save_results(valid_bert_res, './data/bert_ss_res.csv')
 save_results(valid_bert_no_autoregressive_res, './data/bert_no_autoregressive_ss_res.csv')
 save_results(valid_bert_wwm_res, './data/bert_wwm_ss_res.csv')
-save_results(valid_bert_bi_res, './data/bert_bi_ss_res.csv')
 save_results(valid_ernie_res, './data/ernie_ss_res.csv')
 save_results(valid_bert_wwm_ext_res, './data/bert_wwm_ext_ss_res.csv')
 save_results(valid_roberta_wwm_ext_res, './data/roberta_wwm_ext_ss_res.csv')
